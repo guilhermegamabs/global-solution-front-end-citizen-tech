@@ -123,7 +123,28 @@ pytest
 
 ## Deploy
 
-PREENCHER: link do deploy (por exemplo front no Streamlit Community Cloud e API no Render). No front, defina a variável `APIURL` com a URL pública da API. Na API, defina `ALLOWEDORIGINS` com a URL do front (sem `*`).
+Arquitetura publicada: front no Streamlit Community Cloud, API no Render (Docker) e banco PostgreSQL no Neon. O Docker Compose sobe tudo junto (Opção B) e a hospedagem em plataformas é a Opção A.
+
+PREENCHER depois de publicar: link do front e link da API (`/docs`).
+
+### 1. Banco (Neon)
+1. Crie um projeto no Neon e copie a connection string (`postgresql://...?sslmode=require`).
+2. Ela vai em `DATABASEURL` na API. As tabelas são criadas na primeira conexão.
+
+### 2. API (Render)
+1. No Render, crie um *Blueprint* a partir deste repositório (usa o `render.yaml`) ou um *Web Service* com Docker, plano Free, *Root Directory* vazio e *Dockerfile Path* `./backend/Dockerfile`.
+2. Preencha as variáveis marcadas como secretas: `GEMINIAPIKEY`, `DATABASEURL`, `BREVOAPIKEY`, `SENDEREMAIL` e `ALLOWEDORIGINS` (a URL do front).
+3. `SEGREDOAPP` é gerado pelo próprio Render. `MOSTRARCODIGONOLOG` deve ficar `false`.
+4. Confira `https://SUA-API.onrender.com/health`.
+
+O plano gratuito do Render desliga a API após 15 minutos sem uso e a primeira chamada seguinte leva de 30 a 60 segundos. Por isso o front usa timeout de 90 segundos.
+
+### 3. Front (Streamlit Community Cloud)
+1. Em share.streamlit.io, crie um app com o repositório, a branch `main` e o arquivo principal `frontend/app.py`.
+2. Em *Advanced settings*, escolha Python 3.12 e cole em *Secrets* o conteúdo de `frontend/.streamlit/secrets.toml.example`, trocando `APIURL` pela URL real da API.
+
+### Docker (Opção B)
+`docker compose up --build` sobe banco, API e front. Preencha `DBPASSWORD` no `.env`.
 
 ## Acessibilidade aplicada
 
