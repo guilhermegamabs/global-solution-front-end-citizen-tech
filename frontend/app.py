@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import streamlit as st
 
 from features.aboutScreen import renderizarSobre
@@ -10,7 +12,9 @@ from features.unitsScreen import renderizarUpas
 from state.sessionState import estaLogado, iniciarEstado
 from ui.theme import aplicarTema
 
-st.set_page_config(page_title="Orienta Saúde", page_icon="✚", layout="wide")
+caminhoIcone = Path(__file__).parent / "assets" / "icone.png"
+
+st.set_page_config(page_title="Orienta Saúde", page_icon=caminhoIcone, layout="wide")
 
 iniciarEstado()
 aplicarTema()
