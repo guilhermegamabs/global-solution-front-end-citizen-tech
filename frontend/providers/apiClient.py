@@ -36,7 +36,7 @@ def obterUrlApi():
 
 
 def obterTempoLimite():
-    return float(os.getenv("REQUESTTIMEOUT", "40"))
+    return float(os.getenv("REQUESTTIMEOUT", "90"))
 
 
 @st.cache_resource
