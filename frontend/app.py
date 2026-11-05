@@ -5,6 +5,7 @@ from features.dashboardScreen import renderizarPainel
 from features.historyScreen import renderizarHistorico
 from features.sidebarPanel import renderizarBarraLateral
 from features.triageScreen import renderizarTriagem
+from features.unitsScreen import renderizarUpas
 from state.sessionState import iniciarEstado
 from ui.theme import aplicarTema
 
@@ -20,12 +21,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-abaTriagem, abaHistorico, abaPainel, abaSobre = st.tabs(
-    ["🩺 Triagem", "🗂️ Histórico", "📊 Painel", "ℹ️ Sobre"]
+abaTriagem, abaUpas, abaHistorico, abaPainel, abaSobre = st.tabs(
+    ["🩺 Triagem", "🗺️ UPAs próximas", "🗂️ Histórico", "📊 Painel", "ℹ️ Sobre"]
 )
 
 with abaTriagem:
     renderizarTriagem()
+with abaUpas:
+    renderizarUpas()
 with abaHistorico:
     renderizarHistorico()
 with abaPainel:

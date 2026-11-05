@@ -122,6 +122,32 @@ folhaEstilo = f"""
 }}
 .confirmCard strong {{ font-size: 1.05rem; }}
 .confirmCard .confirmLine {{ margin-top: 0.35rem; }}
+.unitCard {{
+    display: flex;
+    gap: 0.8rem;
+    background: #FFFFFF;
+    border: 1px solid #C9DDF0;
+    border-left: 6px solid {azulProfundo};
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.5rem 0;
+    color: {corTexto};
+}}
+.unitCard .unitNumber {{
+    flex: 0 0 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: {azulProfundo};
+    color: #FFFFFF;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}}
+.unitCard .unitName {{ font-weight: 800; color: {azulProfundo}; }}
+.unitCard .unitMeta {{ font-size: 0.92rem; margin-top: 0.15rem; }}
+.unitCard .unitWarning {{ color: #7A3200; font-weight: 600; }}
+.unitCard a {{ color: {azulPrimario}; font-weight: 700; }}
 .alertBanner {{
     border: 2px solid #D32F2F;
     background: #FDE4E4;

@@ -4,6 +4,15 @@ import streamlit as st
 def iniciarEstado():
     st.session_state.setdefault("registros", [])
     st.session_state.setdefault("idAtual", None)
+    st.session_state.setdefault("buscaUpas", None)
+
+
+def definirBuscaUpas(resultado):
+    st.session_state["buscaUpas"] = resultado
+
+
+def obterBuscaUpas():
+    return st.session_state["buscaUpas"]
 
 
 def obterRegistros():

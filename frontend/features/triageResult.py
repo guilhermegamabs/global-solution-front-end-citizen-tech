@@ -80,6 +80,8 @@ def renderizarResultado(registro):
     st.markdown(f'**{registro["summary"]}**')
 
     renderizarCartaoInfo("Onde procurar atendimento", [rotulosServico[registro["recommendedService"]]], "📍")
+    if registro["recommendedService"] == "urgentCare":
+        st.caption("🗺️ Veja as UPAs mais próximas na aba “UPAs próximas”.")
     renderizarCartaoInfo("O que fazer agora", registro["guidance"], "📝")
     renderizarCartaoInfo("Procure ajuda imediata se...", registro["warningSignsToWatch"], "⚠️")
 

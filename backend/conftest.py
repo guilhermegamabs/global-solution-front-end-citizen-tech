@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.dependencies import obterGerador
+from app.dependencies import obterFontesLocalizacao, obterGerador
 from app.main import aplicacao
 from app.providers.recordStore import limparArmazenamento
 
@@ -25,6 +25,10 @@ requisicaoValida = {
 
 def sobrescreverGerador(gerar):
     aplicacao.dependency_overrides[obterGerador] = lambda: gerar
+
+
+def sobrescreverFontes(fontes):
+    aplicacao.dependency_overrides[obterFontesLocalizacao] = lambda: fontes
 
 
 @pytest.fixture

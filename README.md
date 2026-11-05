@@ -6,6 +6,21 @@ Prova de Conceito CitizenTech da Global Solution 2026/2 (Front-end em Sistemas d
 
 PREENCHER: quem é afetado, qual a dor concreta e a fonte que sustenta (dado, notícia, relato ou entrevista). Sugestão: superlotação de UPAs e pronto-socorros por casos de baixa complexidade, e dificuldade do cidadão em saber onde buscar atendimento.
 
+## Mapa de UPAs próximas
+
+Aba "UPAs próximas": o cidadão informa só o CEP e vê as UPAs mais próximas em lista e em mapa Plotly (OpenStreetMap, com hover e zoom).
+
+Fontes de dados abertos cruzadas com a entrada do cidadão:
+
+- **ViaCEP:** CEP para endereço e código IBGE do município.
+- **Nominatim (OpenStreetMap):** endereço para latitude e longitude.
+- **AwesomeAPI:** coordenadas do CEP de cada unidade, usadas para conferir o cadastro do CNES.
+- **CNES (DataSUS):** UPAs e pronto atendimentos do município, com coordenadas, telefone e turno. O backend pagina a API (20 por página), ignora cadastros sem coordenada ou desabilitados, guarda o resultado por 6 horas e calcula a distância (fórmula de haversine).
+
+Privacidade: só o CEP é enviado, ele não é gravado e o cache do front guarda a consulta por 10 minutos. Qualidade da posição: as coordenadas do CNES às vezes erram. O backend cruza cada unidade com a posição do CEP dela (AwesomeAPI); se divergirem mais de 1,5 km, tenta corrigir pelo nome no OpenStreetMap (Nominatim) e reordena a lista. Se não conseguir corrigir, a unidade aparece marcada como "posição aproximada" no mapa e na lista. O botão "Como chegar" usa nome e endereço escritos, não coordenadas.
+
+Limites conhecidos: o CNES pode ter telefone e horário desatualizados, e a busca cobre apenas o município do CEP.
+
 ## Fluxo CitizenTech
 
 1. **Entrada:** formulário com validação (texto de 10 a 800 caracteres, faixa de idade, duração, sinais de alerta, confirmação de ciência).
@@ -30,7 +45,7 @@ flowchart LR
 ```
 backend/
   app/
-    routers/     um arquivo por serviço (health, meta, triage, review)
+    routers/     um arquivo por serviço (health, meta, triage, review, units)
     schemas/     modelos Pydantic de entrada e saída
     pipelines/   lógica de triagem, trava de segurança, revisão
     providers/   acesso ao Gemini e armazenamento em memória
