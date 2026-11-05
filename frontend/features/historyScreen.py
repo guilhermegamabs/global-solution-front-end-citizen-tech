@@ -11,7 +11,7 @@ def formatarData(dataIso):
 
 
 def renderizarHistorico():
-    st.subheader("Suas solicitações nesta sessão")
+    st.subheader("Seu histórico")
     registros = obterRegistros()
 
     if not registros:

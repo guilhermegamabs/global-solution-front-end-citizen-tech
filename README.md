@@ -6,6 +6,37 @@ Prova de Conceito CitizenTech da Global Solution 2026/2 (Front-end em Sistemas d
 
 PREENCHER: quem é afetado, qual a dor concreta e a fonte que sustenta (dado, notícia, relato ou entrevista). Sugestão: superlotação de UPAs e pronto-socorros por casos de baixa complexidade, e dificuldade do cidadão em saber onde buscar atendimento.
 
+## Conta, verificação por e-mail e histórico
+
+- **Cadastro:** e-mail e senha. A conta só passa a valer depois de confirmar um código de 6 números enviado por e-mail (vale 10 minutos, máximo de 5 tentativas, reenvio a cada 60 segundos).
+- **E-mail único:** guardado em minúsculas, com restrição `UNIQUE` no banco.
+- **Senha:** hash `scrypt` (biblioteca padrão), nunca em texto puro. O código de verificação também fica só como hash (HMAC com `SEGREDOAPP`).
+- **Sessão:** token aleatório de 7 dias; só o hash dele vai para o banco, então o logout invalida de verdade.
+- **Proteções:** bloqueio de 15 minutos após 5 logins errados, mensagem igual para e-mail inexistente e senha errada, reenvio de código sem revelar se o e-mail existe.
+- **Histórico por usuário:** triagem e revisão exigem login e são gravadas no banco. O texto que a pessoa digita não é gravado (minimização de dados, LGPD); guarda-se o resultado da IA, a faixa de idade e a revisão humana.
+- **Direito de apagar:** o menu lateral tem "Apagar minha conta", que remove usuário, sessões, códigos e histórico.
+
+### Banco de dados
+
+SQLAlchemy Core com a variável `DATABASEURL`. As tabelas (`users`, `verificationCodes`, `sessions`, `triageRecords`) são criadas na primeira conexão.
+
+| Ambiente | Banco |
+|---|---|
+| Testes | SQLite em memória |
+| Local sem Docker | SQLite em arquivo (`sqlite:///orienta.db`) |
+| Docker Compose | PostgreSQL 16 em volume persistente |
+| Produção | PostgreSQL no Neon (a URL `postgres://...` é ajustada automaticamente) |
+
+### E-mail (Brevo)
+
+Crie uma conta na Brevo, gere uma chave de API e verifique um e-mail remetente. Preencha `BREVOAPIKEY` e `SENDEREMAIL`. Para desenvolver sem enviar e-mail, use `MOSTRARCODIGONOLOG=true` e o código aparece no terminal da API (nunca use isso em produção).
+
+### Limites conhecidos
+
+- Ao recarregar a página (F5) o Streamlit perde a sessão e a pessoa entra de novo.
+- O bloqueio de logins errados fica na memória do processo (zera ao reiniciar e não é compartilhado entre instâncias).
+- Sem migrações versionadas: o esquema é criado automaticamente. Para evoluir o banco em produção, o próximo passo seria Alembic.
+
 ## Mapa de UPAs próximas
 
 Aba "UPAs próximas": o cidadão informa só o CEP e vê as UPAs mais próximas em lista e em mapa Plotly (OpenStreetMap, com hover e zoom).
@@ -59,7 +90,7 @@ frontend/
 
 ## Como rodar
 
-Copie `.env.example` para `.env` na raiz e preencha `GEMINIAPIKEY`.
+Copie `.env.example` para `.env` na raiz e preencha `GEMINIAPIKEY`, `SEGREDOAPP` (gere com `openssl rand -base64 48`) e as variáveis de e-mail. No Docker, preencha também `DBPASSWORD`.
 
 ### Local
 

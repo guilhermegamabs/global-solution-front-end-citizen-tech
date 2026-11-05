@@ -1,14 +1,14 @@
 import streamlit as st
 
 from providers.apiClient import ApiError, enviarRevisao
-from state.sessionState import aplicarRevisao, limparAtual
+from features.apiErrors import mostrarErroApi
+from state.sessionState import aplicarRevisao, limparAtual, obterToken
 from ui.components import (
     renderizarAviso,
     renderizarCartaoConfirmacao,
     renderizarCartaoInfo,
     renderizarCartaoProtocolo,
     renderizarFaixaEmergencia,
-    renderizarFaixaErro,
     renderizarSeloUrgencia,
 )
 from ui.theme import estilosUrgencia, ordemUrgencia, rotulosDecisao, rotulosServico
@@ -63,10 +63,11 @@ def renderizarRevisao(registro):
                         "decision": decisao,
                         "correctedUrgency": urgenciaCorrigida,
                         "helpful": util,
-                    }
+                    },
+                    obterToken(),
                 )
         except ApiError as erro:
-            renderizarFaixaErro(str(erro))
+            mostrarErroApi(erro)
             return
         aplicarRevisao(idRegistro, {**resposta, "helpful": util})
         st.rerun()

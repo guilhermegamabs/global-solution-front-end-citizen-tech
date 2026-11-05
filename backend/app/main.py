@@ -5,7 +5,15 @@ from fastapi.responses import JSONResponse
 
 from app.config import obterOrigensPermitidas
 from app.errors import ApiFailure
-from app.routers import healthRouter, metaRouter, reviewRouter, triageRouter, unitsRouter
+from app.routers import (
+    authRouter,
+    healthRouter,
+    historyRouter,
+    metaRouter,
+    reviewRouter,
+    triageRouter,
+    unitsRouter,
+)
 
 aplicacao = FastAPI(title="Orienta Saúde API", version="1.0.0")
 
@@ -17,6 +25,8 @@ aplicacao.add_middleware(
 )
 
 aplicacao.include_router(healthRouter.roteador)
+aplicacao.include_router(authRouter.roteador)
+aplicacao.include_router(historyRouter.roteador)
 aplicacao.include_router(metaRouter.roteador)
 aplicacao.include_router(triageRouter.roteador)
 aplicacao.include_router(reviewRouter.roteador)
@@ -25,7 +35,10 @@ aplicacao.include_router(unitsRouter.roteador)
 
 @aplicacao.exception_handler(ApiFailure)
 async def tratarFalha(requisicao: Request, erro: ApiFailure):
-    return JSONResponse(status_code=erro.codigoStatus, content={"message": erro.mensagemUsuario})
+    conteudo = {"message": erro.mensagemUsuario}
+    if erro.codigoErro:
+        conteudo["code"] = erro.codigoErro
+    return JSONResponse(status_code=erro.codigoStatus, content=conteudo)
 
 
 @aplicacao.exception_handler(RequestValidationError)

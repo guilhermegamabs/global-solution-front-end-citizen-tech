@@ -1,10 +1,65 @@
 import streamlit as st
 
+chavesDaSessao = (
+    "token",
+    "emailUsuario",
+    "registros",
+    "idAtual",
+    "buscaUpas",
+    "etapaAuth",
+    "emailPendente",
+    "confirmarApagar",
+)
+
 
 def iniciarEstado():
+    st.session_state.setdefault("token", None)
+    st.session_state.setdefault("emailUsuario", None)
     st.session_state.setdefault("registros", [])
     st.session_state.setdefault("idAtual", None)
     st.session_state.setdefault("buscaUpas", None)
+    st.session_state.setdefault("etapaAuth", "entrar")
+    st.session_state.setdefault("emailPendente", None)
+
+
+def estaLogado():
+    return st.session_state["token"] is not None
+
+
+def obterToken():
+    return st.session_state["token"]
+
+
+def obterEmailUsuario():
+    return st.session_state["emailUsuario"]
+
+
+def definirSessao(token, email, registros):
+    st.session_state["token"] = token
+    st.session_state["emailUsuario"] = email
+    st.session_state["registros"] = list(registros)
+    st.session_state["idAtual"] = None
+    st.session_state["etapaAuth"] = "entrar"
+    st.session_state["emailPendente"] = None
+
+
+def encerrarSessao():
+    for chave in chavesDaSessao:
+        st.session_state.pop(chave, None)
+    iniciarEstado()
+
+
+def obterEtapaAuth():
+    return st.session_state["etapaAuth"]
+
+
+def obterEmailPendente():
+    return st.session_state["emailPendente"]
+
+
+def definirEtapaAuth(etapa, emailPendente=None):
+    st.session_state["etapaAuth"] = etapa
+    st.session_state["emailPendente"] = emailPendente
 
 
 def definirBuscaUpas(resultado):

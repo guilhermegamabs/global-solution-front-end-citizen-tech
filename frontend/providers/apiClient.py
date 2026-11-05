@@ -24,6 +24,10 @@ mensagemRespostaInvalida = "Recebemos uma resposta que não conseguimos entender
 
 
 class ApiError(Exception):
+    codigo = None
+
+
+class SessaoExpiradaError(ApiError):
     pass
 
 
@@ -47,15 +51,19 @@ def lerResposta(resposta):
         raise ApiError(mensagemRespostaInvalida) from None
 
     if resposta.status_code >= 400:
-        mensagem = corpo.get("message") if isinstance(corpo, dict) else None
-        raise ApiError(mensagem or "Algo deu errado. Tente novamente.")
+        dados = corpo if isinstance(corpo, dict) else {}
+        classe = SessaoExpiradaError if dados.get("code") == "sessionExpired" else ApiError
+        erro = classe(dados.get("message") or "Algo deu errado. Tente novamente.")
+        erro.codigo = dados.get("code")
+        raise erro
 
     return corpo
 
 
-def enviarRequisicao(metodo, caminho, carga=None):
+def enviarRequisicao(metodo, caminho, carga=None, token=None):
+    cabecalhos = {"Authorization": f"Bearer {token}"} if token else {}
     try:
-        resposta = obterCliente().request(metodo, caminho, json=carga)
+        resposta = obterCliente().request(metodo, caminho, json=carga, headers=cabecalhos)
     except httpx.TimeoutException:
         raise ApiError("A análise demorou mais do que o esperado. Tente novamente em instantes.") from None
     except httpx.HTTPError:
@@ -64,31 +72,55 @@ def enviarRequisicao(metodo, caminho, carga=None):
     return lerResposta(resposta)
 
 
+def exigirCampos(corpo, campos):
+    if not isinstance(corpo, dict) or any(campo not in corpo for campo in campos):
+        raise ApiError(mensagemRespostaInvalida)
+    return corpo
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def buscarOpcoes():
-    corpo = enviarRequisicao("GET", "/meta/options")
-    if not isinstance(corpo, dict) or "ageRanges" not in corpo:
-        raise ApiError(mensagemRespostaInvalida)
-    return corpo
+    return exigirCampos(enviarRequisicao("GET", "/meta/options"), ("ageRanges",))
 
 
-def solicitarTriagem(carga):
-    corpo = enviarRequisicao("POST", "/triage", carga)
-    if not isinstance(corpo, dict) or any(chave not in corpo for chave in chavesObrigatoriasTriagem):
-        raise ApiError(mensagemRespostaInvalida)
-    return corpo
+def cadastrarConta(email, senha):
+    enviarRequisicao("POST", "/auth/register", {"email": email, "password": senha})
+
+
+def reenviarCodigo(email):
+    enviarRequisicao("POST", "/auth/resend", {"email": email})
+
+
+def verificarCodigo(email, codigo):
+    return exigirCampos(enviarRequisicao("POST", "/auth/verify", {"email": email, "code": codigo}), ("token", "email"))
+
+
+def entrarNaConta(email, senha):
+    return exigirCampos(enviarRequisicao("POST", "/auth/login", {"email": email, "password": senha}), ("token", "email"))
+
+
+def sairDaConta(token):
+    enviarRequisicao("POST", "/auth/logout", token=token)
+
+
+def apagarConta(token):
+    enviarRequisicao("DELETE", "/auth/account", token=token)
+
+
+def buscarHistorico(token):
+    return exigirCampos(enviarRequisicao("GET", "/history", token=token), ("records",))["records"]
+
+
+def solicitarTriagem(carga, token):
+    return exigirCampos(enviarRequisicao("POST", "/triage", carga, token), chavesObrigatoriasTriagem)
 
 
 @st.cache_data(ttl=600, show_spinner=False)
 def buscarUpasProximas(cep, limite):
-    corpo = enviarRequisicao("POST", "/units/nearby", {"cep": cep, "limit": limite})
-    if not isinstance(corpo, dict) or "units" not in corpo or "origin" not in corpo:
-        raise ApiError(mensagemRespostaInvalida)
-    return corpo
+    return exigirCampos(
+        enviarRequisicao("POST", "/units/nearby", {"cep": cep, "limit": limite}), ("units", "origin")
+    )
 
 
-def enviarRevisao(carga):
-    corpo = enviarRequisicao("POST", "/reviews", carga)
-    if not isinstance(corpo, dict) or "finalUrgency" not in corpo:
-        raise ApiError(mensagemRespostaInvalida)
-    return corpo
+def enviarRevisao(carga, token):
+    return exigirCampos(enviarRequisicao("POST", "/reviews", carga, token), ("finalUrgency",))

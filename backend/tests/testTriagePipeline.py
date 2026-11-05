@@ -6,6 +6,9 @@ from app.schemas.triageSchemas import TriageRequest
 from conftest import requisicaoValida, saidaValida
 
 
+usuarioTeste = "usuarioTeste"
+
+
 def montarRequisicao(**alteracoes):
     return TriageRequest(**{**requisicaoValida, **alteracoes})
 
@@ -15,7 +18,7 @@ def geradorValido(promptSistema, promptUsuario):
 
 
 def testeRetornaRespostaEstruturada():
-    resposta = executarTriagem(montarRequisicao(), geradorValido)
+    resposta = executarTriagem(montarRequisicao(), geradorValido, usuarioTeste)
     assert resposta.urgencyLevel.value == "medium"
     assert resposta.protocol.startswith("TRI-")
     assert resposta.recordId
@@ -23,7 +26,7 @@ def testeRetornaRespostaEstruturada():
 
 def testeSinalDeEmergenciaForcaAmbulancia():
     requisicao = montarRequisicao(warningSigns=["chestPain"])
-    resposta = executarTriagem(requisicao, geradorValido)
+    resposta = executarTriagem(requisicao, geradorValido, usuarioTeste)
     assert resposta.urgencyLevel.value == "emergency"
     assert resposta.recommendedService.value == "ambulance"
     assert "sinal de alerta grave" in resposta.rationale
@@ -31,13 +34,13 @@ def testeSinalDeEmergenciaForcaAmbulancia():
 
 def testeSinalSemEmergenciaMantemNivelDoModelo():
     requisicao = montarRequisicao(warningSigns=["highFever"])
-    resposta = executarTriagem(requisicao, geradorValido)
+    resposta = executarTriagem(requisicao, geradorValido, usuarioTeste)
     assert resposta.urgencyLevel.value == "medium"
 
 
 def testeSaidaInvalidaDoModeloLevantaErro():
     with pytest.raises(InvalidModelResponseError):
-        executarTriagem(montarRequisicao(), lambda promptSistema, promptUsuario: {"urgencyLevel": "banana"})
+        executarTriagem(montarRequisicao(), lambda promptSistema, promptUsuario: {"urgencyLevel": "banana"}, usuarioTeste)
 
 
 def testePromptTrataRelatoComoDado():

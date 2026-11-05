@@ -30,8 +30,9 @@ def renderizarSobre():
     renderizarCartaoInfo(
         "Sua privacidade",
         [
-            "Não peça nem digite nome, CPF ou endereço.",
-            "O histórico fica só nesta sessão do navegador.",
+            "Não digite nome, CPF ou endereço no relato.",
+            "Guardamos só o seu e-mail e o resultado das análises. O texto que você escreve não é salvo.",
+            "Você pode apagar a conta e todo o histórico no menu lateral.",
         ],
         "🔒",
     )

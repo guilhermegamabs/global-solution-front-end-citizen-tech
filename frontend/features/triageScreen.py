@@ -3,7 +3,8 @@ import streamlit as st
 from features.triageForm import renderizarFormularioTriagem, validarEntrada
 from features.triageResult import renderizarResultado
 from providers.apiClient import ApiError, buscarOpcoes, solicitarTriagem
-from state.sessionState import adicionarRegistro, obterRegistroAtual
+from features.apiErrors import mostrarErroApi
+from state.sessionState import adicionarRegistro, obterRegistroAtual, obterToken
 from ui.components import renderizarEstadoVazio, renderizarFaixaErro
 
 
@@ -16,9 +17,9 @@ def processarEnvio(envio):
 
     try:
         with st.spinner("Analisando seus sintomas. Isso leva alguns segundos..."):
-            registro = solicitarTriagem(envio["carga"])
+            registro = solicitarTriagem(envio["carga"], obterToken())
     except ApiError as erro:
-        renderizarFaixaErro(str(erro))
+        mostrarErroApi(erro)
         return
 
     adicionarRegistro(registro)

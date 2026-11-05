@@ -1,12 +1,13 @@
 import streamlit as st
 
 from features.aboutScreen import renderizarSobre
+from features.authScreen import renderizarAutenticacao
 from features.dashboardScreen import renderizarPainel
 from features.historyScreen import renderizarHistorico
 from features.sidebarPanel import renderizarBarraLateral
 from features.triageScreen import renderizarTriagem
 from features.unitsScreen import renderizarUpas
-from state.sessionState import iniciarEstado
+from state.sessionState import estaLogado, iniciarEstado
 from ui.theme import aplicarTema
 
 st.set_page_config(page_title="Orienta Saúde", page_icon="✚", layout="wide")
@@ -20,6 +21,10 @@ st.markdown(
     "<p>Descubra onde buscar atendimento, em linguagem simples.</p></div>",
     unsafe_allow_html=True,
 )
+
+if not estaLogado():
+    renderizarAutenticacao()
+    st.stop()
 
 abaTriagem, abaUpas, abaHistorico, abaPainel, abaSobre = st.tabs(
     ["🩺 Triagem", "🗺️ UPAs próximas", "🗂️ Histórico", "📊 Painel", "ℹ️ Sobre"]
