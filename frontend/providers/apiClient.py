@@ -79,6 +79,14 @@ def solicitarTriagem(carga):
     return corpo
 
 
+@st.cache_data(ttl=600, show_spinner=False)
+def buscarUpasProximas(cep, limite):
+    corpo = enviarRequisicao("POST", "/units/nearby", {"cep": cep, "limit": limite})
+    if not isinstance(corpo, dict) or "units" not in corpo or "origin" not in corpo:
+        raise ApiError(mensagemRespostaInvalida)
+    return corpo
+
+
 def enviarRevisao(carga):
     corpo = enviarRequisicao("POST", "/reviews", carga)
     if not isinstance(corpo, dict) or "finalUrgency" not in corpo:

@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import obterOrigensPermitidas
 from app.errors import ApiFailure
-from app.routers import healthRouter, metaRouter, reviewRouter, triageRouter
+from app.routers import healthRouter, metaRouter, reviewRouter, triageRouter, unitsRouter
 
 aplicacao = FastAPI(title="Orienta Saúde API", version="1.0.0")
 
@@ -20,6 +20,7 @@ aplicacao.include_router(healthRouter.roteador)
 aplicacao.include_router(metaRouter.roteador)
 aplicacao.include_router(triageRouter.roteador)
 aplicacao.include_router(reviewRouter.roteador)
+aplicacao.include_router(unitsRouter.roteador)
 
 
 @aplicacao.exception_handler(ApiFailure)

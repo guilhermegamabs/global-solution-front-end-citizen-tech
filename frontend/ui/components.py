@@ -1,4 +1,5 @@
 from html import escape
+from urllib.parse import quote
 
 import streamlit as st
 
@@ -64,6 +65,41 @@ def renderizarCartaoConfirmacao(protocolo, nivel):
         f'<div class="confirmCard" role="status"><strong>✅ Resposta registrada</strong>'
         f'<div class="confirmLine">Protocolo {escape(protocolo)}</div>'
         f'<div class="confirmLine">{montarHtmlSelo(nivel)}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def montarLinkRota(unidade, cidade):
+    partes = [unidade["name"], unidade["address"], unidade["neighborhood"], cidade]
+    destino = quote(", ".join(parte for parte in partes if parte))
+    return f"https://www.google.com/maps/dir/?api=1&destination={destino}"
+
+
+def renderizarCartaoUnidade(posicao, unidade, cidade=""):
+    incerta = unidade.get("positionUncertain", False)
+    distancia = f'{"cerca de " if incerta else ""}{unidade["distanceKm"]:.1f}'.replace(".", ",")
+    avisoPosicao = (
+        '<div class="unitMeta unitWarning">⚠️ Posição no mapa aproximada. Use o “Como chegar” para o endereço certo.</div>'
+        if incerta
+        else ""
+    )
+    horario = "🕒 Atendimento 24 horas" if unidade["open24h"] else "🕒 Confirme o horário por telefone"
+    telefone = unidade.get("phone")
+    linhaTelefone = ""
+    if telefone:
+        numeros = "".join(caractere for caractere in telefone if caractere.isdigit() or caractere == "+")
+        linhaTelefone = f'<div class="unitMeta">📞 <a href="tel:{escape(numeros)}">{escape(telefone)}</a></div>'
+    rota = montarLinkRota(unidade, cidade)
+    bairro = f' — {escape(unidade["neighborhood"])}' if unidade["neighborhood"] else ""
+    st.markdown(
+        f'<div class="unitCard"><div class="unitNumber" aria-hidden="true">{posicao}</div><div>'
+        f'<div class="unitName">{escape(unidade["name"])}</div>'
+        f'<div class="unitMeta">📍 {escape(unidade["address"])}{bairro}</div>'
+        f'<div class="unitMeta">🧭 A {distancia} km de você · {horario}</div>'
+        f"{avisoPosicao}"
+        f"{linhaTelefone}"
+        f'<div class="unitMeta"><a href="{rota}" target="_blank" rel="noopener noreferrer">Como chegar ↗</a></div>'
+        f"</div></div>",
         unsafe_allow_html=True,
     )
 
