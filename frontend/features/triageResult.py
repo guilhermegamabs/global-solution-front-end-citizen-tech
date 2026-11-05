@@ -11,7 +11,7 @@ from ui.components import (
     renderizarFaixaEmergencia,
     renderizarSeloUrgencia,
 )
-from ui.theme import estilosUrgencia, ordemUrgencia, rotulosDecisao, rotulosServico
+from ui.theme import estilosUrgencia, ordemUrgencia, rotulosDecisao, rotulosServico, significadosUrgencia
 
 
 def formatarUrgencia(nivel):
@@ -28,7 +28,10 @@ def renderizarRevisao(registro):
         return
 
     st.markdown("#### Você confirma esta orientação?")
-    st.caption("Sua avaliação vale mais que a da IA. Confirme ou corrija antes de seguir.")
+    st.caption(
+        "Sua avaliação vale mais que a da IA. Confirmar ou corrigir não avisa nenhum médico nem a UPA: "
+        "serve para registrar a sua opinião e melhorar o app."
+    )
 
     decisao = st.radio(
         "Sua decisão",
@@ -78,6 +81,7 @@ def renderizarResultado(registro):
         renderizarFaixaEmergencia("Ligue 192 (SAMU) agora ou vá ao pronto-socorro mais próximo.")
 
     renderizarSeloUrgencia(registro["urgencyLevel"], grande=True)
+    st.caption(significadosUrgencia[registro["urgencyLevel"]])
     st.markdown(f'**{registro["summary"]}**')
 
     renderizarCartaoInfo("Onde procurar atendimento", [rotulosServico[registro["recommendedService"]]], "📍")

@@ -23,6 +23,7 @@ def processarEnvio(envio):
         return
 
     adicionarRegistro(registro)
+    st.toast("Orientação pronta. Veja o resultado abaixo do formulário ou na coluna ao lado.")
 
 
 def renderizarTriagem():

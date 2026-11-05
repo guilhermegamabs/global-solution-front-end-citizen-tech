@@ -15,6 +15,13 @@ estilosUrgencia = {
     "emergency": {"rotulo": "Emergência", "icone": "🚑", "cor": "#8F1414", "fundo": "#FDE4E4", "borda": "#D32F2F", "grafico": "#D32F2F"},
 }
 
+significadosUrgencia = {
+    "low": "Você pode cuidar em casa ou marcar uma consulta.",
+    "medium": "Procure a Unidade Básica de Saúde em até 2 dias.",
+    "high": "Procure uma UPA ainda hoje.",
+    "emergency": "Ligue 192 (SAMU) agora.",
+}
+
 rotulosServico = {
     "selfCare": "🏠 Cuidado em casa",
     "basicUnit": "🏥 Unidade Básica de Saúde (UBS)",
