@@ -207,7 +207,7 @@ O plano gratuito do Render desliga a API após 15 minutos sem uso e a primeira c
 
 ### Teste de usabilidade com pessoas reais
 
-| Nome | Perfil | Tarefa | Observação (simulada) | Ajuste feito |
+| Nome | Perfil | Tarefa | Observação | Ajuste feito |
 |---|---|---|---|---|
 | P1, José Bitencourt | 45 anos, empreendedor, usa o SUS | Confirmar ou corrigir a urgência | Perguntou se, ao clicar em "Registrar minha resposta", um médico ou a UPA seria avisado | Texto explicando que confirmar ou corrigir não avisa ninguém e serve para registrar a opinião e melhorar o app |
 | P2, Andréa da Gama | 46 anos, auxiliar em fábrica | Contar um sintoma e ler a orientação | Depois de "Analisar sintomas" não percebeu que o resultado aparecia abaixo do formulário e achou que nada tinha acontecido | Aviso na tela ("Orientação pronta...") assim que a análise termina |
