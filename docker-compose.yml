@@ -1,7 +1,26 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: orienta
+      POSTGRES_USER: orienta
+      POSTGRES_PASSWORD: ${DBPASSWORD}
+    volumes:
+      - dadosbanco:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orienta -d orienta"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   api:
     build: ./backend
     env_file: .env
+    environment:
+      DATABASEURL: postgresql://orienta:${DBPASSWORD}@db:5432/orienta
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "8000:8000"
 
@@ -13,3 +32,6 @@ services:
       - api
     ports:
       - "8501:8501"
+
+volumes:
+  dadosbanco:

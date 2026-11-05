@@ -111,5 +111,5 @@ def renderizarFaixaEmergencia(mensagem):
     )
 
 
-def renderizarFaixaErro(mensagem):
-    st.error(mensagem, icon="⚠️")
+def renderizarFaixaErro(mensagem, icone="⚠️"):
+    st.error(mensagem, icon=icone)

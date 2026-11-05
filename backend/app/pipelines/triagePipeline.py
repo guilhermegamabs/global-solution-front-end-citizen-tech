@@ -10,7 +10,7 @@ from app.pipelines.catalog import (
     rotulosSinaisAlerta,
     sinaisEmergencia,
 )
-from app.providers.recordStore import salvarRegistro
+from app.providers.recordRepository import salvarRegistro
 from app.schemas.triageSchemas import (
     RecommendedService,
     TriageModelOutput,
@@ -77,7 +77,7 @@ def montarProtocolo(criadoEm):
     return f"TRI-{criadoEm:%Y%m%d}-{uuid.uuid4().hex[:6].upper()}"
 
 
-def executarTriagem(requisicao, gerar):
+def executarTriagem(requisicao, gerar, idUsuario):
     bruto = gerar(promptSistemaTriagem, montarPromptUsuario(requisicao))
 
     try:
@@ -96,5 +96,5 @@ def executarTriagem(requisicao, gerar):
         ageRange=requisicao.ageRange,
         disclaimer=avisoLegal,
     )
-    salvarRegistro(resposta)
+    salvarRegistro(idUsuario, resposta)
     return resposta
