@@ -78,16 +78,19 @@ flowchart LR
     Routers --> Pipelines
     Pipelines --> Providers
     Providers -->|HTTPS| Gemini
+    Providers -->|SQL| Banco[("PostgreSQL ou SQLite")]
+    Providers -->|HTTPS| Brevo["Brevo (e-mail com o código)"]
+    Providers -->|HTTPS| Dados["ViaCEP, Nominatim, AwesomeAPI e CNES"]
     Routers --> Schemas
 ```
 
 ```
 backend/
   app/
-    routers/     um arquivo por serviço (health, meta, triage, review, units)
+    routers/     um arquivo por serviço (health, meta, auth, history, triage, review, units)
     schemas/     modelos Pydantic de entrada e saída
     pipelines/   lógica de triagem, trava de segurança, revisão
-    providers/   acesso ao Gemini e armazenamento em memória
+    providers/   acesso ao Gemini, banco de dados (usuários, sessões e histórico), e-mail (Brevo), CEP, geocodificação e CNES
   tests/         pytest, sem subir interface nem chamar a IA
 frontend/
   features/      telas por responsabilidade
@@ -137,6 +140,15 @@ Arquitetura publicada: front no Streamlit Community Cloud, API no Render (Docker
 - **API:** https://global-solution-front-end-citizen-tech.onrender.com (documentação em `/docs`, verificação em `/health`)
 
 A API gratuita do Render dorme depois de 15 minutos parada: a primeira chamada pode levar de 30 a 60 segundos.
+
+### Por que esta opção de deploy
+
+O enunciado aceita publicar em plataforma (Opção A) ou entregar com Docker (Opção B). O projeto entrega as duas: o front e a API ficam publicados, e o `docker-compose.yml` sobe tudo localmente.
+
+- **Front no Streamlit Community Cloud:** é gratuito, publica direto do repositório do GitHub e não exige administrar servidor. Como o front não guarda nenhuma chave, ele pode ficar em uma plataforma separada da API.
+- **API no Render, em Docker:** o plano gratuito publica a partir do GitHub, aceita variáveis de ambiente secretas (as chaves do Gemini e da Brevo ficam só na API) e verifica a saúde do serviço em `/health`. Usar Docker faz o mesmo `backend/Dockerfile` servir ao Render e ao Compose, então o que roda local é o que roda publicado.
+- **Banco no Neon (PostgreSQL):** o disco do plano gratuito do Render não é permanente, então um SQLite em arquivo perderia usuários e histórico a cada reinício da API. Com o banco em um serviço à parte, os dados sobrevivem a reinícios e a novas publicações. O plano gratuito do Neon escala a zero quando ocioso, o que basta para uma prova de conceito.
+- **Custo da escolha:** nos planos gratuitos a API dorme após 15 minutos parada e a primeira chamada leva de 30 a 60 segundos. Por isso o front espera até 90 segundos.
 
 ### 1. Banco (Neon)
 1. Crie um projeto no Neon e copie a connection string (`postgresql://...?sslmode=require`).
